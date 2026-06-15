@@ -61,6 +61,7 @@ class FallDetectionService : Service(), SensorEventListener {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        // Ensure service is restarted if killed by system
         return START_STICKY
     }
 
