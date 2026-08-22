@@ -21,6 +21,7 @@ A cutting-edge Android application engineered for real-time motion monitoring, a
 - [Installation & Local Setup](#-installation--local-setup)
 - [Configuration & Build System](#-configuration--build-system)
 - [Technology Stack](#-technology-stack)
+- [What You Can Learn](#-what-you-can-learn)
 - [Contributing Guidelines](#-contributing-guidelines)
 - [License](#-license)
 - [Author](#-author)
@@ -53,44 +54,37 @@ Instead of passive monitoring, GuardianFall features:
 ## 🔄 System Architecture & Workflows
 
 ### 1. Workflow Architecture
-```text
- 🚀 [App Launch] 
-        │
-        ▼
- 📱 [Initialize Foreground Service]
-        │
-        ▼
- 🧭 [Register Accelerometer & Gyroscope Sensors]
-        │
-        ▼
- ⚡ [Continuous Monitoring of Acceleration Vectors]
-        │
-        ├─► [Normal Movement] ──────────► (Loop back to monitoring)
-        │
-        └─► [Threshold Breach Detected]
-                   │
-                   ▼
-            🚨 [Fall / Impact Triggered]
-                   │
-                   ▼
-            ⏱️ [Start Emergency Countdown UI]
-                   │
-                   ├─► [User Cancels] ──► 🔄 [Reset Sensor State]
-                   │
-                   └─► [Timeout Reached] ──► 📡 [Dispatch Emergency SOS Alert]
-2. Data Processing PipelinePlaintext 📲 [Hardware Sensors (X, Y, Z Axes)]
-        │
-        ▼
- 🧮 [Magnitude Calculation: √(x² + y² + z²)]
-        │
-        ▼
- 🧹 [High-Pass Filtering & Noise Suppression]
-        │
-        ▼
- ⚙️ [State Machine Threshold Evaluation]
-        │
-        ▼
- 🎨 [Reactive Update to Jetpack Compose UI / Dashboard]
+```mermaid
+flowchart TD
+    Start(["🚀 App Launch"]) --> Init["📱 Initialize Foreground Service"]
+    Init --> Sensors["🧭 Register Sensors"]
+    
+    Sensors --> Monitor{"⚡ Monitor Motion"}
+    
+    Monitor -->|Normal Movement| Monitor
+    Monitor -->|Threshold Exceeded| Trigger["🚨 Fall Detected"]
+    
+    Trigger --> Countdown["⏱️ Start Countdown UI"]
+    Countdown --> UserResponse{"👤 User Cancels?"}
+    
+    UserResponse -->|Yes| Reset["🔄 Reset State"]
+    UserResponse -->|No / Timeout| Dispatch["📡 Dispatch SOS Alert"]
+    
+    Reset --> Monitor
+    Dispatch --> Finish(["🏁 Alert Broadcasted"])
+2. Data Processing PipelineCode snippetflowchart LR
+    Sensor["📲 Hardware Sensors"] --> Algorithm["🧮 Magnitude Calculation"]
+    Algorithm --> Filter["🧹 High-Pass Filter"]
+    Filter --> StateMachine["⚙️ State Machine"]
+    StateMachine --> UI["🎨 Update Compose UI"]
+3. Application Architecture OverviewCode snippetflowchart TD
+    Android["📱 Android OS Platform"] --> Service["⚙️ Foreground Service Layer"]
+    Service --> Sensors["🧭 Sensor Manager API"]
+    
+    Sensors --> Flow["⚡ Kotlin Coroutines & Flow"]
+    Flow --> ViewModel["🧠 UI ViewModel State"]
+    
+    ViewModel --> UI["🎨 Jetpack Compose UI Dashboard"]
 📂 App Structure & ModulesGuardianFall/
 │
 ├── 📂 .idea/                 # IDE Configuration profiles
@@ -113,14 +107,32 @@ plugins {
     alias(libs.plugins.compose.compiler) apply false
     // alias(libs.plugins.google.services) apply false
 }
-🛠️ Technology StackPlaintext 🟣 Kotlin 2.0+ ──────┐
-                      │
- 🎨 Jetpack Compose ──┼──► 🛡️ [GuardianFall Android App]
-                      │
- ⚙️ Gradle KTS ───────┤
-                      │
- ⚡ Coroutines & Flow ┘
-TechnologyPurposeKotlinCore programming languageJetpack ComposeModern declarative UI frameworkGradle KTSType-safe build configurationCoroutines & FlowAsynchronous background processingSensor APIHardware motion telemetry🎓 What You Can LearnAndroid Sensors: Utilizing SensorManager, handling accelerometer and gyroscope event listeners, and filtering motion noise.Jetpack Compose: Designing reactive layouts, handling mutable state flows, and building modern material-themed components.Android Architecture: Managing persistent background tasks via Foreground Services and Kotlin Coroutines.Modern Build Tooling: Structuring multi-component builds using Gradle Kotlin DSL (build.gradle.kts) and version catalogs.🤝 Contributing GuidelinesContributions, feature suggestions, and bug reports are welcome!Fork the repository.Create your feature branch:Bashgit checkout -b feature/AdvancedMotionFilter
+🛠️ Technology StackCode snippetflowchart LR
+    Kotlin["🟣 Kotlin"] --> App["🛡️ GuardianFall"]
+    Compose["🎨 Jetpack Compose"] --> App
+    Gradle["⚙️ Gradle KTS"] --> App
+    Coroutines["⚡ Coroutines"] --> App
+
+    App --> Android["📱 Android OS"]
+TechnologyPurposeKotlinCore programming languageJetpack ComposeModern declarative UI frameworkGradle KTSType-safe build configurationCoroutines & FlowAsynchronous background processingSensor APIHardware motion telemetry🎓 What You Can LearnCode snippetmindmap
+    root((🛡️ GuardianFall))
+        Android Sensors
+            Accelerometer
+            Gyroscope
+            Gravity Vectoring
+        Jetpack Compose
+            State Management
+            Material 3 Design
+            Composables
+        Architecture
+            Foreground Services
+            Background Processing
+            Coroutines & Flow
+        Build System
+            Gradle KTS
+            Version Catalogs
+            Project Structure
+🤝 Contributing GuidelinesContributions, feature suggestions, and bug reports are welcome!Fork the repository.Create your feature branch:Bashgit checkout -b feature/AdvancedMotionFilter
 Commit your changes:Bashgit commit -m "Add advanced accelerometer noise filtering"
 Push to the branch:Bashgit push origin feature/AdvancedMotionFilter
 Open a Pull Request.📄 LicenseThis project is licensed under the MIT License. See the LICENSE file for details.👨‍💻 AuthorN.H. Kailash
