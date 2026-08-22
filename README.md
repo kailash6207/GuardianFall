@@ -1,186 +1,129 @@
-🛡️ GuardianFall
-Smart Fall Detection & Emergency Response System for Elderly Safety
-<p align="center">
+# 🛡️ GuardianFall 🚨
+**Advanced Android Safety & Fall Detection Application**
 
+![Build Status](https://img.shields.io/github/actions/workflow/status/kailash6207/GuardianFall/android.yml?branch=main&style=for-the-badge)
+![Kotlin](https://img.shields.io/badge/Kotlin-2.0%2B-purple?style=for-the-badge&logo=kotlin)
+![Jetpack Compose](https://img.shields.io/badge/Jetpack%20Compose-UI-4285F4?style=for-the-badge&logo=jetpackcompose)
+![Gradle](https://img.shields.io/badge/Gradle-KTS-02303A?style=for-the-badge&logo=gradle)
+![License](https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge)
+![Platform](https://img.shields.io/badge/Platform-Android-3DDC84?style=for-the-badge&logo=android)
+![Last Updated](https://img.shields.io/badge/Last_Updated-August_2026-orange?style=for-the-badge)
 
+A cutting-edge Android application engineered for real-time motion monitoring, automated emergency detection, and rapid alert dispatch. Built entirely with modern Android development standards using Kotlin, Jetpack Compose, and type-safe Kotlin DSL build scripts (`build.gradle.kts`).
 
+---
 
+## 📑 Table of Contents
+- [Overview](#-overview)
+- [Key Features & Capabilities](#-key-features--capabilities)
+- [System Architecture & Workflows](#-system-architecture--workflows)
+- [App Structure & Modules](#-app-structure--modules)
+- [Installation & Local Setup](#-installation--local-setup)
+- [Configuration & Build System](#-configuration--build-system)
+- [Technology Stack](#-technology-stack)
+- [Contributing Guidelines](#-contributing-guidelines)
+- [License](#-license)
+- [Author](#-author)
 
+---
 
+## 🌐 Overview
 
+**GuardianFall** is designed to provide seamless personal safety monitoring by leveraging native Android hardware sensors. Whether tracking unexpected physical impacts or sudden acceleration shifts, the application runs background services to ensure users remain protected at all times.
 
+Instead of passive monitoring, GuardianFall features:
+* 📱 **Declarative UI:** Built with modern Jetpack Compose for fluid animations and adaptive layouts.
+* ⚡ **Sensor Integration:** Real-time accelerometer and gyroscope data acquisition.
+* 🚨 **Automated Triggers:** Immediate emergency response workflows upon impact detection.
+* 🛠️ **Modern Tooling:** Managed via Type-Safe Project Accessors and Kotlin DSL (`build.gradle.kts`).
 
+---
 
+## ✨ Key Features & Capabilities
 
-](LICENSE)
+| Feature | Description | Technology |
+| :--- | :--- | :--- |
+| **Fall Detection Engine** | Continuous background calculation of vector acceleration thresholds to identify free-falls and sudden impacts. | SensorManager, Coroutines |
+| **Emergency Alert Dispatch** | Automated routing to emergency contacts or cloud notification webhooks upon threshold breach. | Foreground Services |
+| **Interactive Jetpack UI** | Modern, responsive dashboard built with zero legacy XML layouts. | Jetpack Compose, Material 3 |
+| **Modular Build Setup** | Type-safe dependency management across app modules using version catalogs. | Gradle KTS (`libs.versions.toml`) |
 
-</p> <p align="center">
+---
 
-Detect. Verify. Locate. Alert.
+## 🔄 System Architecture & Workflows
 
-GuardianFall is an Android safety application designed to help elderly individuals living independently by detecting potential falls and automatically initiating an emergency response.
-
-</p>
-🚨 Overview
-
-GuardianFall continuously monitors smartphone motion sensors to identify patterns that may indicate a fall.
-
-When a potential fall is detected, the application provides the user with an emergency countdown. If the user is safe, they can cancel the alert.
-
-If the user does not respond, GuardianFall automatically:
-
-📍 Retrieves the user's location
-🚨 Creates an emergency event
-🔔 Notifies emergency contacts
-☁️ Stores relevant emergency information
-
-Give elderly users more independence while giving families faster awareness during potential emergencies.
-
-🧭 How GuardianFall Works
-🛡️ Safety Response Pipeline
-✨ Features
-Feature	Description
-🚨 Real-Time Fall Detection	Monitors smartphone motion sensors for potential falls
-⏳ Emergency Countdown	Gives the user time to cancel a false alarm
-📍 Location Tracking	Retrieves the user's location during emergencies
-👨‍👩‍👧‍👦 Emergency Contacts	Manage people who should receive alerts
-🔔 Instant Alerts	Sends emergency notifications after confirmation timeout
-☁️ Firebase Integration	Stores emergency information in the cloud
-💾 Local Database	Maintains important application data locally
-⚙️ Safety Settings	Allows users to customize emergency behavior
-🧠 Fall Detection Architecture
-⏳ Emergency Countdown Flow
-📍 Emergency Location Flow
-🔔 Emergency Alert System
-🏗️ Application Architecture
-📱 Android Application Flow
-🧩 System Components
-📂 Project Structure
-GuardianFall/
+### 1. Workflow Architecture
+```mermaid
+flowchart TD
+    Start(["🚀 App Launch"]) --> Init["📱 Initialize Foreground Service"]
+    Init --> Sensors["🧭 Register Accelerometer & Gyroscope"]
+    
+    Sensors --> Monitor{"⚡ Monitor Acceleration Vector (a)"}
+    
+    Monitor -->|Normal Movement| Monitor
+    Monitor -->|Threshold Exceeded (> Freefall + Impact)| Trigger["🚨 Fall Detected"]
+    
+    Trigger --> Countdown["⏱️ Start Emergency Countdown UI"]
+    Countdown --> UserResponse{"👤 User Cancels?"}
+    
+    UserResponse -->|Yes| Reset["🔄 Reset Sensor State"]
+    UserResponse -->|No / Timeout| Dispatch["📡 Dispatch Emergency SOS Alert"]
+    
+    Reset --> Monitor
+    Dispatch --> Finish(["🏁 Alert Broadcasted"])
+2. Data Processing PipelineCode snippetflowchart LR
+    Sensor["📲 Hardware Sensors"] -->|Raw Axes (X,Y,Z)| Algorithm["🧮 Magnitude Calculation: √(x²+y²+z²)"]
+    Algorithm --> Filter["🧹 High-Pass & Noise Filter"]
+    Filter --> StateMachine["⚙️ State Machine Evaluation"]
+    StateMachine --> UI["🎨 Update Compose UI / Dashboard"]
+📂 App Structure & ModulesGuardianFall/
 │
-├── 📁 data/
-│   └── 💾 Local and application data
-│
-├── 📁 firebase/
-│   └── ☁️ Firebase integration
-│
-├── 📁 location/
-│   └── 📍 Location services
-│
-├── 📁 sensor/
-│   └── 📡 Sensor and fall detection logic
-│
-├── 📁 service/
-│   └── 🚨 Background and emergency services
-│
-├── 📁 ui/
-│   └── 🎨 Jetpack Compose screens
-│
-├── 📁 utils/
-│   └── 🛠️ Utility functions
-│
-└── 📄 README.md
-🔄 Data Flow
-💾 Data Architecture
-🔐 Safety Concept
+├── 📂 .idea/                 # IDE Configuration profiles
+├── 📂 app/                   # Main Android application module
+│   ├── 📂 src/main/java/     # Kotlin source files (UI, Services, ViewModels)
+│   └── 📂 src/main/res/      # Drawables, values, and manifests
+├── 📂 gradle/                # Gradle wrapper & version catalogs (libs.versions.toml)
+├── 📄 .gitignore
+├── 📄 build.gradle.kts       # Top-level build configuration
+├── 📄 gradle.properties
+├── 📄 gradlew                # Gradle wrapper script (Unix)
+├── 📄 gradlew.bat            # Gradle wrapper script (Windows)
+├── 📄 README.md
+└── 📄 settings.gradle.kts    # Project module inclusions & repositories
+🚀 Installation & SetupPrerequisitesAndroid Studio (Koala / Ladybug or newer recommended)Android SDK (API Level 24 to 34+)JDK 17 or higherStep-by-Step InstructionsClone the repository:Bashgit clone [https://github.com/kailash6207/GuardianFall.git](https://github.com/kailash6207/GuardianFall.git)
+Open in Android Studio:Launch Android Studio, select Open, and choose the cloned GuardianFall folder.Sync Gradle:Allow Android Studio to automatically download dependencies and sync the project using build.gradle.kts.Run the App:Connect an Android physical device (recommended for accurate sensor testing) or start an Android Virtual Device (AVD) emulator, then click Run ▶️.⚙️ Configuration & Build SystemDependency versions and plugin aliases are centrally managed using Gradle version catalogs inside the gradle/ directory.Top-level plugin configuration (build.gradle.kts):Kotlin// Top-level build file where you can add configuration options common to all sub-projects/modules.
+plugins {
+    alias(libs.plugins.android.application) apply false
+    alias(libs.plugins.kotlin.android) apply false
+    alias(libs.plugins.compose.compiler) apply false
+    // alias(libs.plugins.google.services) apply false
+}
+🛠️ Technology StackCode snippetflowchart LR
+    Kotlin["🟣 Kotlin 2.0+"] --> App["🛡️ GuardianFall"]
+    Compose["🎨 Jetpack Compose"] --> App
+    Gradle["⚙️ Gradle KTS"] --> App
+    Coroutines["⚡ Kotlin Coroutines"] --> App
 
-GuardianFall follows a layered emergency approach:
-
-⚙️ Technology Stack
-Technology	Purpose
-🟣 Kotlin	Main application language
-📱 Android SDK	Android platform functionality
-🎨 Jetpack Compose	Modern UI development
-📡 Android Sensors	Motion and accelerometer data
-📍 Google Location Services	Emergency location retrieval
-☁️ Firebase Firestore	Cloud data storage
-💾 Room Database	Local data persistence
-👨‍👩‍👧‍👦 Emergency Contact Management
-⚙️ Safety Settings
-🚨 Emergency State Machine
-🔮 Future Enhancements
-Planned Features
-⌚ Smartwatch Integration
-❤️ Heart Rate Monitoring
-📱 SMS Emergency Alerts
-🎙️ Voice-Activated Emergency Assistance
-🧠 AI-Powered Fall Verification
-🖥️ Family Dashboard Application
-🚀 Installation
-1️⃣ Clone the Repository
-git clone https://github.com/kailash6207/GuardianFall.git
-2️⃣ Open in Android Studio
-
-Open the cloned project using Android Studio.
-
-3️⃣ Configure Firebase
-
-Create or configure your Firebase project and add:
-
-google-services.json
-
-to the appropriate Android application module.
-
-4️⃣ Sync Gradle
-
-Allow Android Studio to download and configure the required dependencies.
-
-5️⃣ Connect an Android Device
-
-Use either:
-
-📱 Physical Android device
-🤖 Android Emulator
-6️⃣ Build and Run
-
-Run the application from Android Studio.
-
-🔄 Installation Workflow
-🧪 Testing Concept
-
-⚠️ Important: Fall detection should be tested using controlled and safe test scenarios. Do not intentionally perform dangerous falls to test the application.
-
-🌍 Use Cases
-🎯 Project Vision
-
-GuardianFall aims to provide peace of mind to families while helping elderly individuals maintain their independence.
-
-🤝 Contributing
-
-Contributions are welcome.
-
-Create a feature branch:
-
-git checkout -b feature/new-safety-feature
-
-Commit your changes:
-
-git add .
-git commit -m "Add new safety feature"
-
-Push your branch:
-
-git push origin feature/new-safety-feature
-
-Then open a Pull Request.
-
-📄 License
-
-This project is licensed under the MIT License.
-
-See LICENSE for details.
-
-👨‍💻 Author
-Kailash N H
-
-Building technology focused on safety, automation, and intelligent assistance.
-
-<p align="center">
-🛡️ Detect Early
-📍 Locate Quickly
-🔔 Alert Immediately
-GuardianFall
-
-Helping people live independently while staying connected to the people who care.
-
-</p>
+    App --> Android["📱 Android OS Platform"]
+TechnologyPurposeKotlinCore programming languageJetpack ComposeModern declarative UI frameworkGradle KTSType-safe build configurationCoroutines & FlowAsynchronous background processingSensor APIHardware motion telemetry🎓 What You Can LearnCode snippetmindmap
+    root((🛡️ GuardianFall))
+        Android Sensors
+            Accelerometer
+            Gyroscope
+            Gravity Vectoring
+        Jetpack Compose
+            State Management
+            Material 3 Design
+            Composables
+        Architecture
+            Foreground Services
+            Background Processing
+            Coroutines & Flow
+        Build System
+            Gradle KTS
+            Version Catalogs
+            Project Structure
+🤝 Contributing GuidelinesContributions, feature suggestions, and bug reports are welcome!Fork the repository.Create your feature branch:Bashgit checkout -b feature/AdvancedMotionFilter
+Commit your changes:Bashgit commit -m "Add advanced accelerometer noise filtering"
+Push to the branch:Bashgit push origin feature/AdvancedMotionFilter
+Open a Pull Request.📄 LicenseThis project is licensed under the MIT License. See the LICENSE file for details.👨‍💻 AuthorN.H. Kailash
