@@ -58,10 +58,10 @@ flowchart TD
     Start(["🚀 App Launch"]) --> Init["📱 Initialize Foreground Service"]
     Init --> Sensors["🧭 Register Accelerometer & Gyroscope"]
     
-    Sensors --> Monitor{"⚡ Monitor Acceleration Vector (a)"}
+    Sensors --> Monitor{"⚡ Monitor Acceleration Vector"}
     
     Monitor -->|Normal Movement| Monitor
-    Monitor -->|Threshold Exceeded (> Freefall + Impact)| Trigger["🚨 Fall Detected"]
+    Monitor -->|Threshold Exceeded| Trigger["🚨 Fall Detected"]
     
     Trigger --> Countdown["⏱️ Start Emergency Countdown UI"]
     Countdown --> UserResponse{"👤 User Cancels?"}
@@ -72,7 +72,7 @@ flowchart TD
     Reset --> Monitor
     Dispatch --> Finish(["🏁 Alert Broadcasted"])
 2. Data Processing PipelineCode snippetflowchart LR
-    Sensor["📲 Hardware Sensors"] -->|Raw Axes (X,Y,Z)| Algorithm["🧮 Magnitude Calculation: √(x²+y²+z²)"]
+    Sensor["📲 Hardware Sensors"] -->|Raw Axes X, Y, Z| Algorithm["🧮 Magnitude Calculation"]
     Algorithm --> Filter["🧹 High-Pass & Noise Filter"]
     Filter --> StateMachine["⚙️ State Machine Evaluation"]
     StateMachine --> UI["🎨 Update Compose UI / Dashboard"]
