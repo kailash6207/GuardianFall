@@ -25,8 +25,10 @@ Built using modern Android development technologies including **Kotlin, Jetpack 
 - [Installation & Local Setup](#-installation--local-setup)
 - [Configuration & Build System](#-configuration--build-system)
 - [Technology Stack](#-technology-stack)
-- [What You Can Learn](#-what-you-can-learn)
+- [Fall Detection Concept](#-fall-detection-concept)
+- [Testing](#-testing)
 - [Future Improvements](#-future-improvements)
+- [What You Can Learn](#-what-you-can-learn)
 - [Contributing Guidelines](#-contributing-guidelines)
 - [License](#-license)
 - [Author](#-author)
@@ -51,9 +53,7 @@ When a potential fall is detected, GuardianFall can initiate an emergency workfl
 - 📡 Emergency alert dispatch
 - 🎨 Modern Jetpack Compose interface
 - ⚡ Background processing
-- 🔒 Reliable safety-oriented architecture
-
-Instead of relying only on manual emergency activation, GuardianFall aims to automatically recognize potentially dangerous motion events and assist the user during an emergency.
+- 🔒 Safety-oriented architecture
 
 ---
 
@@ -62,14 +62,14 @@ Instead of relying only on manual emergency activation, GuardianFall aims to aut
 | Feature | Description | Technology |
 |---|---|---|
 | **Fall Detection Engine** | Analyzes acceleration and motion data to identify potential falls and sudden impacts. | SensorManager, Kotlin |
-| **Accelerometer Monitoring** | Captures real-time device acceleration across X, Y and Z axes. | Android Sensor API |
+| **Accelerometer Monitoring** | Captures real-time acceleration across X, Y and Z axes. | Android Sensor API |
 | **Gyroscope Monitoring** | Tracks rotational movement to improve motion classification. | Android Sensor API |
-| **Motion Processing** | Processes raw sensor data before passing it to the detection state machine. | Kotlin, Coroutines |
-| **Emergency Countdown** | Provides the user with a short period to cancel a detected emergency. | Jetpack Compose |
-| **Emergency Alert Dispatch** | Sends an emergency notification when the countdown expires. | Foreground Service |
-| **Background Monitoring** | Allows motion monitoring to continue while the application is not actively visible. | Android Foreground Service |
-| **Interactive Dashboard** | Displays monitoring and emergency states through a modern UI. | Jetpack Compose, Material 3 |
-| **Reactive State Management** | Connects background sensor processing with the UI. | StateFlow, ViewModel |
+| **Motion Processing** | Processes raw sensor data before detection. | Kotlin Coroutines |
+| **Emergency Countdown** | Gives the user time to cancel a detected emergency. | Jetpack Compose |
+| **Emergency Alert Dispatch** | Sends an emergency notification after the countdown expires. | Foreground Service |
+| **Background Monitoring** | Allows monitoring while the app is not visible. | Android Foreground Service |
+| **Interactive Dashboard** | Displays monitoring and emergency states. | Jetpack Compose, Material 3 |
+| **Reactive State Management** | Connects sensor processing with the UI. | StateFlow, ViewModel |
 | **Modern Build System** | Uses Kotlin DSL and centralized dependency management. | Gradle KTS |
 
 ---
@@ -78,59 +78,115 @@ Instead of relying only on manual emergency activation, GuardianFall aims to aut
 
 ## 1. Fall Detection Workflow
 
-```mermaid
-flowchart TD
-    Start(["🚀 App Launch"]) --> Init["📱 Initialize Foreground Service"]
-    Init --> Sensors["🧭 Register Sensors"]
-
-    Sensors --> Monitor{"⚡ Monitor Motion"}
-
-    Monitor -->|Normal Movement| Monitor
-    Monitor -->|Threshold Exceeded| Trigger["🚨 Fall Detected"]
-
-    Trigger --> Countdown["⏱️ Start Countdown UI"]
-
-    Countdown --> UserResponse{"👤 User Cancels?"}
-
-    UserResponse -->|Yes| Reset["🔄 Reset State"]
-    UserResponse -->|No / Timeout| Dispatch["📡 Dispatch SOS Alert"]
-
-    Reset --> Monitor
-    Dispatch --> Finish(["🏁 Alert Broadcasted"])
+```text
+┌────────────────────┐
+│    🚀 App Launch   │
+└─────────┬──────────┘
+          │
+          ▼
+┌─────────────────────────────┐
+│ Initialize Foreground       │
+│ Service                     │
+└─────────────┬───────────────┘
+              │
+              ▼
+┌─────────────────────────────┐
+│ Register Accelerometer &    │
+│ Gyroscope Sensors            │
+└─────────────┬───────────────┘
+              │
+              ▼
+       ┌───────────────┐
+       │ Monitor Motion│◄──────────────┐
+       └───────┬───────┘               │
+               │                       │
+       ┌───────┴────────┐              │
+       │                │              │
+       ▼                ▼              │
+  Normal Motion    Threshold Exceeded  │
+       │                │              │
+       │                ▼              │
+       │         🚨 Fall Detected      │
+       │                │              │
+       │                ▼              │
+       │       ⏱️ Start Countdown      │
+       │                │              │
+       │          ┌─────┴─────┐        │
+       │          │           │        │
+       │          ▼           ▼        │
+       │       Cancel      Timeout     │
+       │          │           │         │
+       │          ▼           ▼         │
+       │       🔄 Reset    📡 Send SOS │
+       │          │           │         │
+       └──────────┴───────────┘         │
+                  │                     │
+                  └─────────────────────┘
 2. Data Processing Pipeline
-
-Sensor data is processed through multiple stages before a potential fall is classified.
-
+📲 Hardware Sensors
+        │
+        ▼
+🧮 Magnitude Calculation
+        │
+        ▼
+🧹 Signal Filtering
+        │
+        ▼
+⚙️ Fall Detection State Machine
+        │
+        ▼
+🧠 ViewModel State
+        │
+        ▼
+🎨 Jetpack Compose UI
 Processing Stages
 Sensor Acquisition
 Accelerometer data
 Gyroscope data
 Magnitude Calculation
-Calculates the overall acceleration magnitude.
+Calculates overall acceleration magnitude.
 Signal Filtering
 Reduces unwanted sensor noise.
-Helps distinguish meaningful motion from normal movement.
 State Machine
 Determines whether the motion pattern represents a potential fall.
 UI Update
-Updates the Compose interface with the current monitoring state.
+Updates the Compose interface.
 3. Application Architecture
-
-GuardianFall follows a layered Android architecture where sensor processing is separated from the user interface.
-
+                📱 Android OS
+                      │
+                      ▼
+             ⚙️ Foreground Service
+                      │
+                      ▼
+              🧭 Sensor Manager
+                      │
+                      ▼
+             ⚡ Coroutines & Flow
+                      │
+                      ▼
+            🧮 Fall Detection Engine
+                      │
+                      ▼
+                🧠 ViewModel
+                      │
+                      ▼
+             🎨 Jetpack Compose
+                      │
+                      ▼
+                  👤 User
 Architecture Responsibilities
 
 Android OS
 
-Provides the underlying Android lifecycle, sensors, permissions, notifications, and background execution framework.
+Provides the application lifecycle, sensors, permissions, notifications, and background execution framework.
 
 Foreground Service
 
-Maintains sensor monitoring when the application is not actively visible.
+Maintains sensor monitoring while the application is not actively visible.
 
 Sensor Manager
 
-Communicates with the device accelerometer and gyroscope.
+Communicates with the accelerometer and gyroscope.
 
 Fall Detection Engine
 
@@ -138,7 +194,7 @@ Processes sensor measurements and determines whether the motion pattern is suspi
 
 ViewModel
 
-Maintains UI state and communicates processed information to Compose.
+Maintains UI state and communicates information to Compose.
 
 Jetpack Compose
 
@@ -147,42 +203,34 @@ Displays the application's dashboard and emergency states.
 📂 App Structure & Modules
 GuardianFall/
 │
-├── 📂 .github/
-│   └── 📂 workflows/
+├── .github/
+│   └── workflows/
 │       └── android.yml
 │
-├── 📂 .idea/
-│   └── IDE configuration
+├── .idea/
 │
-├── 📂 app/
-│   ├── 📂 src/
-│   │   ├── 📂 main/
-│   │   │   ├── 📂 java/
-│   │   │   │   └── Kotlin source files
-│   │   │   │
-│   │   │   ├── 📂 res/
-│   │   │   │   ├── drawable/
-│   │   │   │   ├── mipmap/
-│   │   │   │   ├── values/
-│   │   │   │   └── xml/
-│   │   │   │
+├── app/
+│   ├── src/
+│   │   ├── main/
+│   │   │   ├── java/
+│   │   │   ├── res/
 │   │   │   └── AndroidManifest.xml
 │   │   │
-│   │   └── 📂 test/
+│   │   └── test/
 │   │
 │   └── build.gradle.kts
 │
-├── 📂 gradle/
-│   ├── 📂 wrapper/
+├── gradle/
+│   ├── wrapper/
 │   └── libs.versions.toml
 │
-├── 📄 .gitignore
-├── 📄 build.gradle.kts
-├── 📄 gradle.properties
-├── 📄 gradlew
-├── 📄 gradlew.bat
-├── 📄 README.md
-└── 📄 settings.gradle.kts
+├── .gitignore
+├── build.gradle.kts
+├── gradle.properties
+├── gradlew
+├── gradlew.bat
+├── README.md
+└── settings.gradle.kts
 🚀 Installation & Local Setup
 Prerequisites
 
@@ -191,15 +239,15 @@ Before building GuardianFall, make sure you have:
 Android Studio Koala, Ladybug, or newer
 Android SDK
 JDK 17 or higher
-A physical Android device is recommended for sensor testing
+Physical Android device recommended for sensor testing
 USB debugging enabled if using a physical device
 1. Clone the Repository
 
-Open a terminal and run:
+Open a terminal:
 
 git clone https://github.com/kailash6207/GuardianFall.git
 
-Move into the project directory:
+Then:
 
 cd GuardianFall
 2. Open in Android Studio
@@ -208,24 +256,19 @@ Open Android Studio and select:
 
 File → Open
 
-Then select the:
+Choose:
 
 GuardianFall
-
-project directory.
-
 3. Sync Gradle
 
-Android Studio should automatically detect the Gradle project.
+Allow Android Studio to:
 
-Allow Gradle to:
-
-Download required dependencies
+Download dependencies
 Configure the Android Gradle Plugin
 Resolve Kotlin dependencies
 Configure Jetpack Compose
 
-Wait until Gradle synchronization completes successfully.
+Wait until Gradle synchronization finishes successfully.
 
 4. Connect an Android Device
 
@@ -237,19 +280,19 @@ Developer Options
         ↓
 USB Debugging
 
-Then connect the device to your computer.
+Connect the device to your computer.
 
 5. Run the Application
 
-Select your Android device from the device selector and press:
+Select your device in Android Studio and press:
 
 ▶ Run
 
-Android Studio will build and install GuardianFall on the selected device.
+Android Studio will build and install GuardianFall.
 
 ⚙️ Configuration & Build System
 
-GuardianFall uses Gradle Kotlin DSL (build.gradle.kts) for project configuration.
+GuardianFall uses Gradle Kotlin DSL (build.gradle.kts).
 
 Dependencies and plugin versions can be centrally managed through:
 
@@ -264,30 +307,7 @@ plugins {
     alias(libs.plugins.compose.compiler) apply false
 }
 
-This allows plugin versions to be managed centrally rather than repeating version numbers throughout the project.
-
-Version Catalog
-
-Dependencies can be managed through:
-
-gradle/libs.versions.toml
-
-Example structure:
-
-[versions]
-kotlin = "2.0.0"
-compose = "..."
-
-[libraries]
-androidx-core-ktx = "..."
-androidx-compose-bom = "..."
-
-[plugins]
-android-application = "..."
-kotlin-android = "..."
-compose-compiler = "..."
-
-The exact versions should match the versions configured in the project.
+This allows plugin versions to be managed centrally.
 
 🛠️ Technology Stack
 Technology	Purpose
@@ -317,27 +337,33 @@ Az = acceleration along Z-axis
 
 The resulting magnitude can be analyzed for sudden changes.
 
-A simplified detection concept could be:
-
-Normal Motion
-      ↓
-Monitor acceleration
-      ↓
-Sudden acceleration change
-      ↓
-Potential impact
-      ↓
-Check motion pattern
-      ↓
-Fall suspected
-      ↓
-Start emergency countdown
-      ↓
-User cancels?
-   ↙        ↘
- YES        NO
- ↓           ↓
-Reset       Send SOS
+Simplified Detection Process
+Normal Movement
+       │
+       ▼
+Monitor Acceleration
+       │
+       ▼
+Sudden Acceleration Change
+       │
+       ▼
+Potential Impact
+       │
+       ▼
+Analyze Motion Pattern
+       │
+       ▼
+Fall Suspected
+       │
+       ▼
+Start Emergency Countdown
+       │
+       ├───────────────┐
+       ▼               ▼
+    Cancel           Timeout
+       │               │
+       ▼               ▼
+    Reset           Send SOS
 
 Note: Fall detection based only on accelerometer or gyroscope thresholds can produce false positives and false negatives. A production safety system should be extensively tested across different devices, users, activities, and environments.
 
@@ -345,7 +371,7 @@ Note: Fall detection based only on accelerometer or gyroscope thresholds can pro
 
 GuardianFall uses Jetpack Compose instead of traditional XML layouts.
 
-The dashboard can provide information such as:
+The dashboard can provide:
 
 🟢 Monitoring status
 📊 Current motion state
@@ -354,9 +380,26 @@ The dashboard can provide information such as:
 ⏱️ Emergency countdown
 📡 Alert status
 ⚙️ Safety configuration
-
-Example UI flow:
-
+UI Flow
+🏠 GuardianFall Dashboard
+          │
+          ├───────────────┐
+          │               │
+          ▼               ▼
+    🟢 Monitoring    ⚙️ Settings
+          │
+          ├───────────────┐
+          │               │
+          ▼               ▼
+    ✅ Normal Motion   ⚠️ Potential Fall
+                          │
+                          ▼
+                  ⏱️ Emergency Countdown
+                          │
+                    ┌─────┴─────┐
+                    │           │
+                    ▼           ▼
+                ❌ Cancel    🚨 Send SOS
 🔐 Permissions
 
 Depending on the implementation, GuardianFall may require Android permissions related to:
@@ -367,7 +410,7 @@ Foreground services
 Location
 Phone/SMS functionality
 
-Only request permissions that are actually required by the application's implemented functionality.
+Only request permissions that are actually required by the implemented functionality.
 
 Users should be clearly informed why each sensitive permission is required.
 
@@ -385,7 +428,7 @@ Simulated fall	Potential fall detected
 User cancels countdown	Alert cancelled
 Countdown expires	Emergency workflow triggered
 App moved to background	Monitoring continues if permitted
-Device restarted	Service behavior follows configured lifecycle
+Device restarted	Service follows configured lifecycle
 Important
 
 Never intentionally perform dangerous falls to test the application.
@@ -393,9 +436,6 @@ Never intentionally perform dangerous falls to test the application.
 Use controlled simulations and safe testing methods.
 
 📈 Future Improvements
-
-GuardianFall can be extended with additional capabilities.
-
 🤖 Machine Learning
 
 A machine-learning model could classify motion patterns instead of relying only on fixed thresholds.
@@ -403,38 +443,54 @@ A machine-learning model could classify motion patterns instead of relying only 
 Potential input features:
 
 Accelerometer
-     +
+      +
 Gyroscope
-     +
-Motion duration
-     +
-Impact magnitude
-     +
-Orientation change
-     ↓
+      +
+Motion Duration
+      +
+Impact Magnitude
+      +
+Orientation Change
+      │
+      ▼
 Machine Learning Model
-     ↓
+      │
+      ▼
 Fall Probability
 ☁️ Cloud Emergency Backend
 
 A backend service could receive emergency events and maintain event history.
 
+📱 GuardianFall
+       │
+       ▼
+☁️ Emergency API
+       │
+       ├───────────────┐
+       ▼               ▼
+🗄️ Event Database   🔔 Notification Service
+                           │
+                           ▼
+                    👤 Emergency Contact
 📍 Location Sharing
 
 An emergency event could optionally include the user's current location.
 
-Possible workflow:
-
 Fall Detected
-     ↓
+      │
+      ▼
 Countdown
-     ↓
+      │
+      ▼
 No Cancellation
-     ↓
+      │
+      ▼
 Get Location
-     ↓
+      │
+      ▼
 Create SOS Event
-     ↓
+      │
+      ▼
 Send Alert
 🧠 Advanced Sensor Fusion
 
@@ -447,16 +503,47 @@ Gyroscope
 Gravity Sensor
       +
 Orientation
-      ↓
+      │
+      ▼
 Sensor Fusion
-      ↓
+      │
+      ▼
 Motion Classification
-      ↓
+      │
+      ▼
 Fall Detection
 🎓 What You Can Learn
 
 Working on GuardianFall provides practical experience with:
 
+Android Development
+Kotlin
+Android APIs
+Application lifecycle
+Sensors
+Accelerometer
+Gyroscope
+Gravity vector
+Sensor fusion
+Jetpack Compose
+Composables
+State management
+Material 3
+UI state
+Architecture
+ViewModel
+Foreground Services
+Coroutines
+Flow
+Build System
+Gradle KTS
+Version Catalogs
+Dependency management
+Safety Systems
+Event detection
+State machines
+Emergency workflows
+Alert dispatch
 🤝 Contributing Guidelines
 
 Contributions, feature suggestions, bug reports, and improvements are welcome.
@@ -491,7 +578,7 @@ When reporting a problem, include:
 Android version
 Device model
 GuardianFall version
-Steps to reproduce the issue
+Steps to reproduce
 Expected behavior
 Actual behavior
 Relevant logs or screenshots
@@ -500,11 +587,13 @@ Example:
 
 Device: Pixel 7
 Android: 15
-Issue: Fall detection triggers during normal walking
+
+Issue:
+Fall detection triggers during normal walking.
 
 Steps:
 1. Start GuardianFall
-2. Walk normally for several minutes
+2. Walk normally
 3. App triggers emergency countdown
 
 Expected:
@@ -548,15 +637,10 @@ https://github.com/kailash6207
 If you find GuardianFall useful:
 
 ⭐ Star the repository
-
 🍴 Fork the project
-
 🐛 Report bugs
-
 💡 Suggest improvements
-
 🤝 Contribute code
-
 🛡️ GuardianFall
 
 Detect. Respond. Protect.
